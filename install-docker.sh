@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # Install Docker
+echo -e "--------"
 echo -e "----Install Docker----"
 sudo apt-get update
 sudo apt upgrade -y

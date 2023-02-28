@@ -1,12 +1,14 @@
 #!/bin/bash
 
 # Disable swap
+echo -e "--------"
 echo -e "----Disable swap----"
 #sudo sed -i '/ swap / s/^\(.*\)$/#\1/g' /etc/fstab
 sudo sed -i '/swap/s/^/#/' /etc/fstab
 sudo swapoff -a
 
 # Install container.d
+echo -e "--------"
 echo -e "Install container.d"
 sudo tee /etc/modules-load.d/containerd.conf <<EOF
 overlay
@@ -27,6 +29,7 @@ sudo systemctl restart containerd
 sudo systemctl enable containerd
 
 # Install Kubernetes components
+echo -e "--------"
 echo -e "----Install Kubernetes components----"
 sudo apt update
 sudo apt install curl apt-transport-https  -y
@@ -37,7 +40,7 @@ sudo apt update
 sudo apt install kubeadm kubelet kubectl kubernetes-cni -y
 
 sudo apt-mark hold kubelet kubeadm kubectl
-sudo kubectl version --client && kubeadm version
+
 
 
 # Enable kernel modules
