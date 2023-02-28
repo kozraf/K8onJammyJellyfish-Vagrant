@@ -23,23 +23,23 @@ Vagrant.configure("2") do |config|
   # Initialize the Kubernetes control plane on the first node
   config.vm.define "node1" do |node|
     config.vm.hostname = "node1.local"
- #	node.vm.provision "shell", path: "init-control-plane.sh"
+ 	node.vm.provision "shell", path: "init-control-plane.sh"
   end
 
   # Generate a join token on the control plane node
   
   config.vm.define "node1" do |node|
-  # node.vm.provision "shell", inline: "kubeadm token create --print-join-command > /vagrant/join-command.sh"
+   node.vm.provision "shell", inline: "kubeadm token create --print-join-command > /vagrant/join-command.sh"
   end
 
   config.vm.define "node2" do |node|
     config.vm.hostname = "node2.local"
- #	node.vm.provision "shell", path: "join-command.sh"
+ 	node.vm.provision "shell", path: "join-command.sh"
   end		
 	
   config.vm.define "node3" do |node|
     config.vm.hostname = "node3.local"
- #	node.vm.provision "shell", path: "join-command.sh"
-  end	
+ 	node.vm.provision "shell", path: "join-command.sh"
+  end
   
 end
