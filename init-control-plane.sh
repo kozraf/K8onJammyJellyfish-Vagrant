@@ -15,12 +15,8 @@ export KUBECONFIG=/home/vagrant/.kube/config
 sleep 30
 
 # Install Calico pod network add-on
-#echo -e "----Install Calico pod network add-on----"
-#kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/v3.25.0/manifests/tigera-operator.yaml
-#wget https://raw.githubusercontent.com/projectcalico/calico/v3.25.0/manifests/custom-resources.yaml
-#sudo sed -i 's/ 192.168.0.0/ 10.10.0.0/' /home/vagrant/custom-resources.yaml
-#kubectl apply -f custom-resources.yaml
-#sleep 15
+echo -e "--------"
+echo -e "----Install Calico pod network add-on----"
 kubectl apply -f https://github.com/weaveworks/weave/releases/download/v2.8.1/weave-daemonset-k8s.yaml
 
 #Confirm master node is ready
