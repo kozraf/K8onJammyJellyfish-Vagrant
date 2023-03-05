@@ -28,4 +28,4 @@ kubectl get pods --all-namespaces
 # Print the kubeadm join command for the worker nodes
 echo -e "--------"
 echo -e "----Print the kubeadm join command for the worker nodes----"
-kubeadm token create --print-join-command > /vagrant/join-command.sh
+kubeadm token create --print-join-command > /vagrant/K8/join-command.sh
