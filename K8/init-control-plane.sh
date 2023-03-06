@@ -3,7 +3,30 @@
 # Initialize the Kubernetes control plane
 echo -e "--------"
 echo -e "----Initialize the Kubernetes control plane----"
-sudo kubeadm init --apiserver-advertise-address 192.168.89.141 --pod-network-cidr 10.10.0.0/16 --control-plane-endpoint=node1.local
+
+#https://kubernetes.io/docs/tasks/administer-cluster/kubeadm/kubeadm-certs/#kubelet-serving-certs
+mkdir /home/vagrant/K8
+sudo tee /home/vagrant/K8/config.yaml <<EOF
+---
+apiVersion: kubeadm.k8s.io/v1beta3
+kind: ClusterConfiguration
+apiServer:
+  certSANs:
+  - 192.168.89.141
+  extraArgs:
+    advertise-address: 192.168.89.141
+controlPlaneEndpoint: node1.local
+networking:
+  podSubnet: 10.10.0.0/16
+---
+apiVersion: kubelet.config.k8s.io/v1beta1
+kind: KubeletConfiguration
+serverTLSBootstrap: true
+EOF
+
+sudo kubeadm init --config=/home/vagrant/K8/config.yaml
+
+#--apiserver-advertise-address 192.168.89.141 --pod-network-cidr 10.10.0.0/16 --control-plane-endpoint=node1.local
 
 # Copy Kubernetes configuration files to user directory
 echo -e "--------"
@@ -11,6 +34,7 @@ echo -e "----Copy Kubernetes configuration files to user directory----"
 mkdir -p /home/vagrant/.kube
 sudo cp -i /etc/kubernetes/admin.conf /home/vagrant/.kube/config
 sudo chown  vagrant:vagrant /home/vagrant/.kube/config
+sudo chown -R vagrant:vagrant /home/vagrant/.kube/
 export KUBECONFIG=/home/vagrant/.kube/config
 sleep 30
 
@@ -24,6 +48,21 @@ echo -e "--------"
 echo -e "----Confirm master node is ready----"
 kubectl get nodes -o wide
 kubectl get pods --all-namespaces
+
+#Serving Certificates Signed by Cluster CA - enable serverTLSBootstrap
+echo -e "--------"
+echo -e "----Approve certs that are still shown as Pending----"
+kubectl patch configmap kubelet-config -n kube-system --type merge -p '{"data":{"kubelet":"serverTLSBootstrap: true\n"}}'
+sudo systemctl restart kubelet.service
+kubectl get csr
+kubectl get csr | grep Pending | awk '{print $1}' | xargs -I {} kubectl certificate approve {}
+
+
+#Remove taint from node1
+echo -e "--------"
+echo -e "----Remove taint from node1----"
+kubectl taint nodes node1 node-role.kubernetes.io/control-plane-
+
 
 # Print the kubeadm join command for the worker nodes
 echo -e "--------"
