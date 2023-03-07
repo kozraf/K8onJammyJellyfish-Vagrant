@@ -4,7 +4,8 @@
 echo -e "--------"
 echo -e "----Initialize the Kubernetes control plane----"
 
-#https://kubernetes.io/docs/tasks/administer-cluster/kubeadm/kubeadm-certs/#kubelet-serving-certs
+# https://particule.io/en/blog/kubeadm-metrics-server/
+# https://kubernetes.io/docs/tasks/administer-cluster/kubeadm/kubeadm-certs/#kubelet-serving-certs
 mkdir /home/vagrant/K8
 sudo tee /home/vagrant/K8/config.yaml <<EOF
 ---
@@ -26,8 +27,6 @@ EOF
 
 sudo kubeadm init --config=/home/vagrant/K8/config.yaml
 
-#--apiserver-advertise-address 192.168.89.141 --pod-network-cidr 10.10.0.0/16 --control-plane-endpoint=node1.local
-
 # Copy Kubernetes configuration files to user directory
 echo -e "--------"
 echo -e "----Copy Kubernetes configuration files to user directory----"
@@ -46,14 +45,13 @@ kubectl apply -f https://github.com/weaveworks/weave/releases/download/v2.8.1/we
 #Confirm master node is ready
 echo -e "--------"
 echo -e "----Confirm master node is ready----"
+sleep 15
 kubectl get nodes -o wide
 kubectl get pods --all-namespaces
 
 #Serving Certificates Signed by Cluster CA - enable serverTLSBootstrap
 echo -e "--------"
 echo -e "----Approve certs that are still shown as Pending----"
-kubectl patch configmap kubelet-config -n kube-system --type merge -p '{"data":{"kubelet":"serverTLSBootstrap: true\n"}}'
-sudo systemctl restart kubelet.service
 kubectl get csr
 kubectl get csr | grep Pending | awk '{print $1}' | xargs -I {} kubectl certificate approve {}
 
