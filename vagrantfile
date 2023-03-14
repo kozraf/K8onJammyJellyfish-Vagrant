@@ -26,7 +26,7 @@ Vagrant.configure("2") do |config|
  	node.vm.provision "shell", path: "K8/init-control-plane.sh"
   end
 
-  # Generate a join token on the control plane node
+  # Generate a join token on the control plane node, clone github repo and install software
 
   config.vm.define "node1" do |node|
    node.vm.provision "shell", inline: "kubeadm token create --print-join-command > /vagrant/K8/join-command.sh"
@@ -34,6 +34,11 @@ Vagrant.configure("2") do |config|
    # Install Helm
    node.vm.provision "shell", inline: "sudo chmod 700 /home/vagrant/K8onJammyJellyfish-Vagrant/helm/helm_install.sh"
    node.vm.provision "shell", inline: "/home/vagrant/K8onJammyJellyfish-Vagrant/helm/helm_install.sh"
+   # Install TF
+   node.vm.provision "shell", inline: "sudo chmod 700 /home/vagrant/K8onJammyJellyfish-Vagrant/Terraform/terraform_install.sh"
+   node.vm.provision "shell", inline: "/home/vagrant/K8onJammyJellyfish-Vagrant/Terraform/terraform_install.sh"
+
+
    # Install K8-metrics-server
 #   node.vm.provision "shell", inline: "sudo chmod 700 /home/vagrant/K8onJammyJellyfish-Vagrant/K8-metrics_server/k8-metrics-server-install.sh"
 #   node.vm.provision "shell", inline: "sudo chown vagrant:vagrant /home/vagrant/K8onJammyJellyfish-Vagrant/K8-metrics_server/k8-metrics-server-install.sh"
